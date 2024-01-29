@@ -26,30 +26,6 @@ pub fn build(b: *std.Build) !void {
     try link(b, main_tests, .{ .gpu_dawn_options = gpu_dawn_options });
     b.installArtifact(main_tests);
     test_step.dependOn(&b.addRunArtifact(main_tests).step);
-
-    const example = b.addExecutable(.{
-        .name = "gpu-hello-triangle",
-        .root_source_file = .{ .path = "examples/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-    example.root_module.addImport("gpu", module);
-    try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
-
-    // Link GLFW
-    const glfw_dep = b.dependency("mach_glfw", .{
-        .target = target,
-        .optimize = optimize,
-    });
-    example.root_module.addImport("glfw", glfw_dep.module("mach-glfw"));
-    @import("mach_glfw").addPaths(example);
-
-    b.installArtifact(example);
-
-    const example_run_cmd = b.addRunArtifact(example);
-    example_run_cmd.step.dependOn(b.getInstallStep());
-    const example_run_step = b.step("run-example", "Run the example");
-    example_run_step.dependOn(&example_run_cmd.step);
 }
 
 pub const Options = struct {
